@@ -52,7 +52,9 @@ class GladosTTS:
         self.device = device
 
 
-    def tts(self, text, key=False, speak=False):
+    def tts(self, text, start_event, done_event, key=None, speak=False):
+        
+        print("Starting thread", key)
         # Tokenize, clean and phonemize input text
         x = prepare_text(text).to('cpu')
 
@@ -71,6 +73,7 @@ class GladosTTS:
             audio = audio.squeeze()
             audio = audio * 32768.0
             audio = audio.cpu().numpy().astype('int16')
+            print("Done converting voice")
             if(key):
                 output_file = ('audio/GLaDOS-tts-temp-output-'+key+'.wav')
             else:
@@ -79,12 +82,17 @@ class GladosTTS:
             # Write audio file to disk
             # 22,05 kHz sample rate 
             write(output_file, 22050, audio)
-
+            
             if speak:
                 print("SPEAKING!!")
+                # Wait for the previous thread to finish playing
+                start_event.wait()
                 self.play_audio(output_file)
-                print("DONE SPEKING!!")
-
+            done_event.set()
+                # print("DONE SPEKING!!")
+            # Signal that this thread is done playing
+            
+            print("Closing thread", key)
         return True
     
     def play_audio(self, output_file):

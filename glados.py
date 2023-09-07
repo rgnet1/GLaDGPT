@@ -65,7 +65,7 @@ while(1):
         write(output_file, 22050, audio)
 
         # Play audio file
-        # if 'winsound' in mod:
-        #     winsound.PlaySound(output_file, winsound.SND_FILENAME)
-        # else:
-        #     call(["aplay", "./output.wav"])
+        if 'winsound' in mod:
+            winsound.PlaySound(output_file, winsound.SND_FILENAME)
+        else:
+            call(["aplay", "./output.wav"])
